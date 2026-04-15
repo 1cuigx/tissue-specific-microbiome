@@ -1,0 +1,25 @@
+# R session artifacts
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+*.Rproj
+
+# Generated figures and tables (re-created by the scripts)
+*.pdf
+*.svg
+Supplementary_Table_*.csv
+Fig3abcd_KT_*.csv
+Fig3abcd_TPM_*.csv
+Fig3abcd_PCA_*.svg
+Fig3abcd_pca_*.svg
+Fig3f_gsva_scores.csv
+Fig3f_labeled_pathways_not_significant.csv
+Fig3g_gsva_Sym_vs_Apo_limma.csv
+Fig3g_gsva_Gas_vs_Epi_limma.csv
+Fig3g_gsva_Sym_vs_Apo_and_Gas_vs_Epi_t.csv
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*~

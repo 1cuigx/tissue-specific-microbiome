@@ -1,0 +1,136 @@
+---
+title: "Differential expression analysis for tissue-specific microbiome (Fig. 3a-d)"
+output:
+  html_document:
+    df_print: paged
+---
+
+Kallisto pseudoalignment outputs are stored in `./kallisto/`.
+Run with the current folder as the working directory.
+
+```{r setup, message = FALSE}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(ggfortify)
+library(sleuth)
+library(UpSetR)
+library(pheatmap)
+
+base_dir <- "."
+```
+
+```{r sample-table}
+sample_id <- dir(file.path(base_dir, "kallisto"))
+kal_dirs  <- sapply(sample_id, function(id) file.path(base_dir, "kallisto", id))
+
+s2c <- data.frame(
+  sample    = sample_id,
+  condition = rep(c("ApoEpi", "ApoGas", "SymEpi", "SymGas"), each = 4),
+  state     = rep(c("Apo", "Sym"), each = 8),
+  tissue    = rep(rep(c("Epi", "Gas"), each = 4), times = 2)
+)
+s2c_kal <- dplyr::mutate(s2c, path = kal_dirs)
+s2c_kal
+```
+
+read in all 16 samples into one sleuth object to fit and normalize expression levels
+```{r fit-all}
+so_all <- sleuth::sleuth_prep(s2c_kal, ~ condition)
+so_all <- sleuth::sleuth_fit(so_all)
+#so_all <- sleuth::sleuth_wt(so_all, "conditionSymGas")
+```
+
+## PCA on TPM (filtered+normalized)
+
+```{r pca}
+sva_fil_norm_kt   <- kallisto_table(so_all, use_filtered = TRUE,  normalized = TRUE,  include_covariates = FALSE)
+
+sva_fil_norm_tpm <- sva_fil_norm_kt %>% 
+  select(gene_id = target_id, sample, tpm) %>% 
+  spread(gene_id, tpm)
+
+make_pca_plot <- function(tpm_tbl, scale_ = TRUE, layer_rep) {
+  prc <- prcomp(tpm_tbl[, -1], scale. = scale_)
+  impor <- summary(prc)$importance
+  pc1 <- round(impor[2, 1] * 100, 1)
+  pc2 <- round(impor[2, 2] * 100, 1)
+  tpm_tbl$State <- rep(c("Apo", "Sym"), each = 8)
+  tpm_tbl$Layer <- layer_rep
+  autoplot(prc, data = tpm_tbl, colour = "State", shape = "Layer") +
+    theme_bw() +
+    theme(axis.line = element_line(colour = "black"),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          panel.border = element_blank(),
+          panel.background = element_blank()) +
+    xlab(paste0("PC1 (", pc1, "%)")) +
+    ylab(paste0("PC2 (", pc2, "%)")) +
+    scale_color_manual(values = c("#67a9cf", "#ef8a62"))
+}
+
+p_fil_norm <- make_pca_plot(sva_fil_norm_tpm, scale_ = TRUE,
+                            layer_rep = rep(rep(c("Epidermis", "Gastrodermis"), 2), 2))
+
+ggsave("Fig3abcd_pca_fil_norm.svg", plot = p_fil_norm, width = 6, height = 4, dpi = 300)
+p_fil_norm
+```
+
+## Pairwise contrasts
+
+```{r helper-pairwise}
+run_pair <- function(idx, contrast_name, tag, colour_var) {
+  so_p <- sleuth::sleuth_prep(s2c_kal[idx, ], ~ condition)
+  so_p <- sleuth::sleuth_fit(so_p)
+  so_p <- sleuth::sleuth_wt(so_p, contrast_name)
+
+  rt <- sleuth_results(so_p, contrast_name)
+  write.csv(rt, file = paste0("Fig3abcd_RT_", tag, ".csv"), row.names = FALSE)
+
+  kt <- kallisto_table(so_p, use_filtered = TRUE, normalized = TRUE, include_covariates = FALSE)
+  write.csv(kt, file = paste0("Fig3abcd_KT_", tag, "_filtered_normalized.csv"), row.names = FALSE)
+
+  tpm <- kt %>% select(gene_id = target_id, sample, tpm) %>% spread(gene_id, tpm)
+  write.csv(tpm, file = paste0("Fig3abcd_TPM_", tag, "_filtered_normalized.csv"), row.names = FALSE)
+
+  prc <- prcomp(tpm[, -1], scale. = TRUE)
+  impor <- summary(prc)$importance
+  pc1 <- round(impor[2, 1] * 100, 1)
+  pc2 <- round(impor[2, 2] * 100, 1)
+
+  if (colour_var == "tissue") {
+    tpm$tissue <- rep(c("Epidermis", "Gastrodermis"), each = 4)
+  } else {
+    tpm$state <- rep(c("Apo", "Sym"), each = 4)
+  }
+
+  p <- autoplot(prc, data = tpm, colour = colour_var) +
+    theme_bw() +
+    theme(axis.line = element_line(colour = "black"),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          panel.border = element_blank(),
+          panel.background = element_blank()) +
+    xlab(paste0("PC1 (", pc1, "%)")) +
+    ylab(paste0("PC2 (", pc2, "%)"))
+  ggsave(paste0("Fig3abcd_PCA_", tag, "_filtered_normalized.svg"),
+         plot = p, width = 6, height = 4, dpi = 300)
+  p
+}
+```
+
+```{r pair-ApoEn-ApoEc}
+run_pair(1:8, "conditionApoGas", "ApoGas_vs_ApoEpi", colour_var = "tissue")
+```
+
+```{r pair-SymEn-SymEc}
+run_pair(9:16, "conditionSymGas", "SymGas_vs_SymEpi", colour_var = "tissue")
+```
+
+```{r pair-SymEc-ApoEc}
+run_pair(c(1:4, 9:12), "conditionSymEpi", "SymEpi_vs_ApoEpi", colour_var = "state")
+```
+
+```{r pair-SymEn-ApoEn}
+run_pair(c(5:8, 13:16), "conditionSymGas", "SymGas_vs_ApoGas", colour_var = "state")
+```

@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rm -f Fig1a_16S_taxonomy_plot.R Fig1b_16S_phyla_plot.R Fig1cde_16S_phyla_representative_boxplot_revise.R Fig2abc_boxplot_coding_taxonomy_revised.R Fig2d_coding_phyla_plot.R Fig2d_mRNA_phyla_revise.R Fig3e_Expression_plot_with_nitrite_reductase.R Fig3f_gsva_norm_revised2.R Fig3g_gsva_all_scatterplot_revised.R Fig4cde_AA_15N_plot_revised.R FigS3_global_PCoA_all16.r FigS5_AA_15N_plot_revised_rep2.R)",
+      "Bash(mv Fig1cde_16S_phyla_representative_boxplot.xlsx Fig1cde_16S_phyla_boxplot.xlsx)",
+      "Bash(mv Fig4cde_AA_for_R.xlsx Fig4cde_AA.xlsx)",
+      "Bash(mv FigS5_AA_for_R_Rep2.xlsx FigS5_AA_rep2.xlsx)",
+      "Bash(mv RT_ApoEn_vs_ApoEc.csv Fig3abcd_RT_ApoEn_vs_ApoEc.csv)",
+      "Read(//private/tmp/**)",
+      "Bash(unzip -o \"/Users/gc/KAUST Dropbox/guoxin cui/data/Tissue-specific microbiome/Manuscript/R1/NComms/R2/DataCode copy/tsm_R1.docx\" word/document.xml -d tsm_extract)",
+      "Bash(python3 -c ':*)",
+      "Bash(awk '{print $NF}')",
+      "Bash(grep -v \"^\\\\.$\\\\|^\\\\.\\\\.$\")"
+    ]
+  }
+}

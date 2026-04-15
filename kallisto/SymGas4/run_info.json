@@ -1,0 +1,9 @@
+{
+	"n_targets": 10669,
+	"n_bootstraps": 100,
+	"n_processed": 38417970,
+	"kallisto_version": "0.43.1",
+	"index_version": 10,
+	"start_time": "Sun Mar 11 16:28:38 2018",
+	"call": "kallisto quant -i Bacteria_trans_withKOs_min100bp_CdHit95_S80_BacteriaONLY.idx -o kallisto/SymEn4 --bias -b 100 -t 24 /dev/fd/63 /dev/fd/62"
+}
