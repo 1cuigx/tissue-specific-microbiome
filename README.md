@@ -55,8 +55,8 @@ Figure-to-file mapping:
 |  1c–e  | `Fig1cde_phyla_boxplot.R`                | `Fig1cde_phyla_boxplot.xlsx`                                       |
 |  2a–c  | `Fig2abc_coding_taxonomy.R`              | `Fig2abc_coding_taxonomy.xlsx`                                     |
 |   2d   | `Fig2d_coding_phyla.R`                   | `Fig2d_coding_phyla.xlsx`                                          |
-|  3a–d  | `Fig3abcd_sleuth_diff_expr.Rmd`          | `kallisto/`                                                        |
-|   3e   | `Fig3e_expression_nitrite_reductase.R`   | `Fig3abcd_RT_*.csv` (from 3a–d)                                    |
+|  3a–d  | `Fig3abcd_DE_PCA.Rmd`                    | `kallisto/`                                                        |
+|   3e   | `Fig3e_NiR.R`                            | `Fig3abcd_RT_*.csv` (from 3a–d)                                    |
 |   3f   | `Fig3f_gsva_heatmap.R`                   | `kallisto/`, `aipBac.kegg.gs.all.RData`, `map_des.tsv`             |
 |   3g   | `Fig3g_gsva_scatterplot.R`               | `kallisto/`, `aipBac.kegg.gs.all.RData`, `map_des_category.xlsx`   |
 |  4c–e  | `Fig4cde_AA_15N_plot.R`                  | `Fig4cde_AA.xlsx`                                                  |
